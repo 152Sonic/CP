@@ -115,11 +115,11 @@
 \begin{tabular}{ll}
 \textbf{Grupo} nr. & 99 (preencher)
 \\\hline
-a11111 & Nome1 (preencher)	
+a89605 & Carlos Miguel Luzia de Carvalho
 \\
-a22222 & Nome2 (preencher)	
+a89519 & José Pedro Carvalho Costa	
 \\
-a33333 & Nome3 (preencher)	
+a89458 & Francisco Correia Franco	
 \end{tabular}
 \end{center}
 
@@ -999,22 +999,43 @@ maisEsq = cataBTree g
 esq_aux (a,(Nothing, d)) = Just a
 esq_aux (a,(e,_)) = e 
 
+-------------------------
+
 insOrd' x = cataBTree g 
   where g = undefined
+  --either (Node(x,(Empty,Empty)), Empty)  insOrd_a x
 
-insOrd a x = undefined
+--insOrd_a x a = (a, listToBtree . iSort . inordt x ) 
+--insOrd (a,(e,d)) x = undefined
+--insOrd_a x (a,(e,Empty)) = if(x>a) then (Node(a,(e,Empty)), Node(a,(e,Node(x,(Empty,Empty))))) 
+--insOrd_a x (a,(Empty,d)) = if(x<a) then (Node (a,(Empty,d)), Node (a,(Node(x,(Empty,Empty)),d)))
+
+
+
+
+insOrd a x = undefined 
+--p1.insOrd' x
+
+-------------------------
+
 
 isOrd' = cataBTree g
-  where g = undefined
+  where g = either (const (True,Empty))  isOrd_a
 
 
+--Node(a,(l,r)) -> (a,((Bool1,btree1),(Bool2,btree2))) -> (bolla,Node(a,(e,d))
+
+isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
+
+isOrd_a (a,((b1,Empty),(b2, Node (d,(l2,r2))))) = if(a<d && b1 && b2) then (True, Node(a,(Empty,Node (d,(l2,r2))))) else (False, Node(a,(Empty,Node(d,(l2,r2)))))
+
+isOrd_a (a,((b1,Node (e,(l1,r1))) ,(b2,Empty))) = if(a>e && b1 && b2) then (True, Node(a,(Node(e,(l1,r1)),Empty))) else (False, Node(a,(Node(e,(l1,r1)),Empty)))
+
+isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a > e && a < d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
+                                                             | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
 
 
-isOrd l = isOrd_aux . inordt 
-
-isOrd_aux :: (Ord a) => [a] -> Bool
-isOrd_aux (t) | (t == qSort t) = True
-              | otherwise = False
+isOrd = p1 . isOrd' 
 
 
 
@@ -1029,24 +1050,39 @@ splay l t =  undefined
 \subsection*{Problema 3}
 
 \begin{code}
+
 extLTree :: Bdt a -> LTree a
 extLTree = cataBdt g where
-  g = undefined
+  g = either Leaf (Fork . p2)
 
-inBdt = undefined
 
-outBdt = undefined
+inBdt = either Dec Query
 
-baseBdt = undefined
-recBdt = undefined
 
-cataBdt = undefined
+outBdt (Dec a) = Left a
+outBdt (Query (a,(t1,t2)))  = Right(a,(t1,t2))
 
-anaBdt = undefined
+
+baseBdt f g = id -|- (f >< (g >< g))
+
+
+recBdt f = baseBdt id f 
+
+
+
+cataBdt a = a . (recBdt (cataBdt a)) . outBdt
+
+
+
+anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
+
 
 navLTree :: LTree a -> ([Bool] -> LTree a)
 navLTree = cataLTree g 
-  where g = undefined
+      where g = undefined
+
+
+
 \end{code}
 
 

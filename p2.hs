@@ -51,22 +51,62 @@ esq_aux (a,(e,_)) = e
 
 
 
+--isOrd
+
+--isOrd' = cataBTree g
+--  where g = either (const (True,Empty))  isOrd_a
+
+
+--Node(a,(l,r)) -> (a,((Bool1,btree1),(Bool2,btree2))) -> (bolla,Node(a,(e,d))
+--isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
+--isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a >= e && a < d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
+--                                                             | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
+
+
+--isOrd = i1 . isOrd' 
+
+
+
+
+
+--insOrd
+
+--insOrd' x = cataBTree g 
+--  where g = either (const (Empty, Node(x,(Empty,Empty)))) insOrd_a x
+
+--insOrd_a x (a,(Empty,Empty)) = if(x <= a) then (Node(a,(Empty,Empty)),Node(a, (Node(x,(Empty,Empty)), Empty))) else (Node(a,(Empty,Empty)),Node(a,(Empty,Node(x,(Empty,Empty)))))
+
+
+--insOrd_a x (a,(Empty,Node (d,(l1,r2)))) = if(x <= a) then (Node(a,(Empty,Node (d,(l1,r2)))),Node(a, (Node(x,(Empty,Empty)), Node (d,(l1,r2))))) else 
+
+--insOrd a x = p2.insOrd' x
+
+--insereOrdenado :: a -> BTree a -> (BTree a, BTree a)
+--insereOrdenado x (Empty) =(Empty, Node(x,(Empty,Empty)))
+--insereOrdenado x (a,(Empty,Empty)) | x > a = (Node(a,(Empty,Empty)),Node(a,(Empty,Node(x,(Empty,Empty)))))
+--                                   | otherwise = (Node(a,(Empty,Empty)),Node(a,(Node(x,(Empty,Empty)), Empty)))
+--insereOrdenado x (a,(e,d)) | x >a = insereOrdenado x d
+--                           | otherwise = insereOrdenado x e 
+
+
+
+
+
 insOrd' x = cataBTree g 
-  where g = undefined
+  where g = either (Empty, Node(x,(Empty,Empty)))  insOrd_a x
 
-insOrd a x = undefined
+--insOrd_a x a = (a, listToBtree . iSort . inordt x ) 
+
+insOrd_a x (a,(_,Empty)) = if(x>a) then (Node(a,(_,Empty)), Node(a,(_,Node(x,(Empty,Empty)))))
+insOrd_a x (a,(Empty,_)) = if(x<a) then (Node (a,(Empty,_)), Node (a,(Node(x,(Empty,Empty)),_)))
 
 
 
 
-isOrd' = cataBTree g
-  where g = undefined
+insOrd a x = p2.insOrd' x
 
-isOrd l = (isOrd_aux.inordt) l
 
-isOrd_aux :: (Eq a,Ord a) => [a] -> Bool
-isOrd_aux (t) | (t == qSort t) = True
-              | otherwise = False
+
 
 
 
