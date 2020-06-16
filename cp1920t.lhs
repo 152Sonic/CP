@@ -1043,7 +1043,11 @@ rrot = undefined
 
 lrot = undefined
 
-splay l t =  undefined
+splay = (flip (cataBTree g)) 
+  where g = either (\x -> const Empty) (curry (aux_spl))
+        aux_spl ((a,(e,d)), [])= Node(a,(e [], d []))
+        aux_spl ((a,(e,d)), (h:t)) | h == True  = e t
+                                | otherwise = d t 
   
 \end{code}
 
@@ -1079,7 +1083,10 @@ anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
 
 navLTree :: LTree a -> ([Bool] -> LTree a)
 navLTree = cataLTree g 
-      where g = undefined
+  where g = either (flip (const Leaf)) (curry aux_Nav)
+        aux_Nav ((l,v),[])= Fork(l [], v [])
+        aux_Nav ((l,v), (h:t)) | h == True  = l t
+                               | otherwise = v t 
 
 
 

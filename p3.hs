@@ -54,4 +54,9 @@ anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
 
 navLTree :: LTree a -> ([Bool] -> LTree a)
 navLTree = cataLTree g 
-  where g = undefined
+  where g = either (/x -> const Leaf) curry aux
+
+
+aux ((l,v),[])= Fork(l [], v [])
+aux ((l,v), (h:t)) | h == True  = l t
+                   | otherwise = v t 
