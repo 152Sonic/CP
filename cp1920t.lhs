@@ -1039,15 +1039,21 @@ isOrd = p1 . isOrd'
 
 
 
-rrot = undefined
+rrot (Empty)                       = Empty
+rrot (Node(a,(Empty,Empty)))       = Node(a,(Empty,Empty))
+rrot (Node(a,(Node(e, (l,r)), d))) = Node(e,(l, Node(a,(r,d))))
 
-lrot = undefined
+
+lrot (Empty)                      = Empty
+lrot (Node(a,(Empty,Empty)))      = Node(a,(Empty,Empty))
+lrot (Node(a,(e, Node(d,(l,r))))) = Node (d,(Node(a,(e,l)), r))
+
 
 splay = (flip (cataBTree g)) 
   where g = either (\x -> const Empty) (curry (aux_spl))
         aux_spl ((a,(e,d)), [])= Node(a,(e [], d []))
         aux_spl ((a,(e,d)), (h:t)) | h == True  = e t
-                                | otherwise = d t 
+                                   | otherwise = d t 
   
 \end{code}
 
