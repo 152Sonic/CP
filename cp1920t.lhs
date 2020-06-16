@@ -1103,7 +1103,10 @@ navLTree = cataLTree g
 
 \begin{code}
 bnavLTree = cataLTree g
-  where g = undefined
+  where g = either (flip (const Leaf)) (curry aux_bNav)
+        aux_bNav ((l,r), Empty) = Fork(l Empty, r Empty)
+        aux_bNav ((l,r),(Node(a,(e,d)))) | a == True = l e
+                                         | otherwise = r d
 
 
 pbnavLTree = cataLTree g
