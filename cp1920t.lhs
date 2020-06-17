@@ -968,14 +968,16 @@ outras funções auxiliares que sejam necessárias.
 
 \subsection*{Problema 1}
 \begin{code}
-discollect :: (Ord b, Ord a) => [(b, [a])] -> [(b, a)]
-discollect = undefined
+
+discollect :: (Ord b, Ord a) => [(b,[a])] -> [(b,a)]
+discollect = g .! id where
+    g (a,x) = [(a,b) | b <- x]
 
 dic_exp :: Dict -> [(String,[String])]
 dic_exp = collect . tar
 
 tar = cataExp g where
-  g = undefined
+  g =  undefined
 
 dic_rd = undefined
 
@@ -1002,51 +1004,60 @@ esq_aux (a,(e,_)) = e
 -------------------------
 
 insOrd' x = cataBTree g 
-  where g = undefined
-  --either (Node(x,(Empty,Empty)), Empty)  insOrd_a x
+  where g = either (const (Node(x,(Empty,Empty)), Empty))  insOrd_a 
+        insOrd_a (a,((e2,e1),(d2,d1))) = if(x > a) then (Node(a,(e1,d2)), Node(a,(e1,d1))) else (Node(a,(e2,d1)), Node(a,(e1,d1))) 
+        --(Node a, (Node e,(e1,d1), Node (d, (e2,d2)) = if () 
 
---insOrd_a x a = (a, listToBtree . iSort . inordt x ) 
+
+--(list2BTree . (iSort x). inordt , a)
+
+
 --insOrd (a,(e,d)) x = undefined
 --insOrd_a x (a,(e,Empty)) = if(x>a) then (Node(a,(e,Empty)), Node(a,(e,Node(x,(Empty,Empty))))) 
 --insOrd_a x (a,(Empty,d)) = if(x<a) then (Node (a,(Empty,d)), Node (a,(Node(x,(Empty,Empty)),d)))
 
+{-
+list2BTree []   = Empty
+list2BTree [x]  = Node(x, (Empty,Empty))
+list2BTree list = Node(x,(list2BTree ltx, list2BTree gtx))
+                  where 
+                    m = (div (length list) 2)
+                    x = list !! m
+                    ltx = take m list
+                    gtx = drop (m+1) list
 
-
-
-insOrd a x = undefined 
---p1.insOrd' x
+-}
+insOrd x = p1.(insOrd' x)
 
 -------------------------
 
 
 isOrd' = cataBTree g
   where g = either (const (True,Empty))  isOrd_a
+        isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
+        isOrd_a (a,((b1,Empty),(b2, Node (d,(l2,r2))))) = if(a<d && b1 && b2) then (True, Node(a,(Empty,Node (d,(l2,r2))))) else (False, Node(a,(Empty,Node(d,(l2,r2)))))
+        isOrd_a (a,((b1,Node (e,(l1,r1))) ,(b2,Empty))) = if(a>e && b1 && b2) then (True, Node(a,(Node(e,(l1,r1)),Empty))) else (False, Node(a,(Node(e,(l1,r1)),Empty)))
+        isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a > e && a < d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
+                                                                     | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
 
 
 --Node(a,(l,r)) -> (a,((Bool1,btree1),(Bool2,btree2))) -> (bolla,Node(a,(e,d))
-
-isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
-
-isOrd_a (a,((b1,Empty),(b2, Node (d,(l2,r2))))) = if(a<d && b1 && b2) then (True, Node(a,(Empty,Node (d,(l2,r2))))) else (False, Node(a,(Empty,Node(d,(l2,r2)))))
-
-isOrd_a (a,((b1,Node (e,(l1,r1))) ,(b2,Empty))) = if(a>e && b1 && b2) then (True, Node(a,(Node(e,(l1,r1)),Empty))) else (False, Node(a,(Node(e,(l1,r1)),Empty)))
-
-isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a > e && a < d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
-                                                             | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
 
 
 isOrd = p1 . isOrd' 
 
 
 
-rrot (Empty)                       = Empty
-rrot (Node(a,(Empty,Empty)))       = Node(a,(Empty,Empty))
-rrot (Node(a,(Node(e, (l,r)), d))) = Node(e,(l, Node(a,(r,d))))
+rrot Empty = Empty
+--rrot (Node(a,(Empty,Empty)))                  = Node(a,(Empty,Empty))
+rrot (Node(a,(Empty,d))) = Node(a,(Empty,d))
+rrot (Node(a,(Node(e,(l,r)), d))) = Node(e,(l, Node(a,(r,d))))
 
 
-lrot (Empty)                      = Empty
-lrot (Node(a,(Empty,Empty)))      = Node(a,(Empty,Empty))
-lrot (Node(a,(e, Node(d,(l,r))))) = Node (d,(Node(a,(e,l)), r))
+lrot (Empty) = Empty
+--lrot (Node(a,(Empty,Empty)))                  = Node(a,(Empty,Empty))
+lrot (Node(a,(e,Empty))) = Node(a,(e,Empty))
+lrot (Node(a,(e, Node(d,(l,r))))) = Node(d,(Node(a,(e,l)), r))
 
 
 splay = (flip (cataBTree g)) 
@@ -1087,6 +1098,8 @@ cataBdt a = a . (recBdt (cataBdt a)) . outBdt
 anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
 
 
+
+
 navLTree :: LTree a -> ([Bool] -> LTree a)
 navLTree = cataLTree g 
   where g = either (flip (const Leaf)) (curry aux_Nav)
@@ -1098,6 +1111,20 @@ navLTree = cataLTree g
 
 \end{code}
 
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |Bdt|
+&
+    |String + (String ><(Bdt ><Bdt))|
+            \ar[l]_-{|inBdt|}
+\\
+     |Bdt'|
+            \ar[u]^-{|ana f|}
+            \ar[r]_-{|f|}
+&
+     |String + String >< (Bdt' >< Bdt')|
+           \ar[u]_{|id + id >< ana (f >< f)|}
+}
 
 \subsection*{Problema 4}
 

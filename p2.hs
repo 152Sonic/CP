@@ -89,6 +89,23 @@ esq_aux (a,(e,_)) = e
 --                           | otherwise = insereOrdenado x e 
 
 
+insOrd' x = cataBTree g 
+  where g = undefined
+  --either (const (Empty, Node(x,(Empty,Empty)))) insOrd_a x
+
+
+list2BTree []   = Empty
+list2BTree [x]  = Node(x, (Empty,Empty))
+list2BTree list = Node(x,(list2BTree ltx, list2BTree gtx))
+                  where 
+                    m = (div (length list) 2)
+                    x = list !! m
+                    ltx = take m list
+                    gtx = drop (m+1) list
+
+
+insOrd a x = list2BTree .(iSort . inordt)
+
 
 
 
