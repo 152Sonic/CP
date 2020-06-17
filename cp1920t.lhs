@@ -977,11 +977,28 @@ dic_exp :: Dict -> [(String,[String])]
 dic_exp = collect . tar
 
 tar = cataExp g where
-  g =  undefined
+  g =  either t_1 t_2
 
-dic_rd = undefined
+t_1 x = [("",x)]
 
-dic_in = undefined
+t_2 (o,l) = map(\(x,y) -> ((o++x),y)) (concat l)  
+
+dic_rd  p = (procura p) . dic_exp
+
+procura p [] = Nothing
+procura p ((a,o):t) | p == a  = Just o
+                    |otherwise = procura p t   
+
+--dic_in = undefined
+dic_in p m = dic_imp . (inserir_cenas p m) . dic_exp
+
+inserir_cenas a o [] = [(a,[o])]
+inserir_cenas a o ((p,s1):t) | a == p = (p, (inserir2 o s1)):t
+                             | otherwise = (p,s1): (inserir_cenas a o t)
+
+inserir2 s1 [] = [s1]
+inserir2 s1 (h2:t2) | s1 == h2 = (h2:t2)
+                    | otherwise = h2 :(inserir2 s1 t2)                        
 
 \end{code}
 
@@ -1006,30 +1023,8 @@ esq_aux (a,(e,_)) = e
 insOrd' x = cataBTree g 
   where g = either (const (Node(x,(Empty,Empty)), Empty))  insOrd_a 
         insOrd_a (a,((e2,e1),(d2,d1))) = if(x > a) then (Node(a,(e1,d2)), Node(a,(e1,d1))) else (Node(a,(e2,d1)), Node(a,(e1,d1))) 
-        --(Node a, (Node e,(e1,d1), Node (d, (e2,d2)) = if () 
 
-
---(list2BTree . (iSort x). inordt , a)
-
-
---insOrd (a,(e,d)) x = undefined
---insOrd_a x (a,(e,Empty)) = if(x>a) then (Node(a,(e,Empty)), Node(a,(e,Node(x,(Empty,Empty))))) 
---insOrd_a x (a,(Empty,d)) = if(x<a) then (Node (a,(Empty,d)), Node (a,(Node(x,(Empty,Empty)),d)))
-
-{-
-list2BTree []   = Empty
-list2BTree [x]  = Node(x, (Empty,Empty))
-list2BTree list = Node(x,(list2BTree ltx, list2BTree gtx))
-                  where 
-                    m = (div (length list) 2)
-                    x = list !! m
-                    ltx = take m list
-                    gtx = drop (m+1) list
-
--}
 insOrd x = p1.(insOrd' x)
-
--------------------------
 
 
 isOrd' = cataBTree g
@@ -1040,22 +1035,16 @@ isOrd' = cataBTree g
         isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a >= e && a <= d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
                                                                      | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
 
-
---Node(a,(l,r)) -> (a,((Bool1,btree1),(Bool2,btree2))) -> (bolla,Node(a,(e,d))
-
-
 isOrd = p1 . isOrd' 
 
 
 
 rrot Empty = Empty
---rrot (Node(a,(Empty,Empty)))                  = Node(a,(Empty,Empty))
 rrot (Node(a,(Empty,d))) = Node(a,(Empty,d))
 rrot (Node(a,(Node(e,(l,r)), d))) = Node(e,(l, Node(a,(r,d))))
 
 
 lrot (Empty) = Empty
---lrot (Node(a,(Empty,Empty)))                  = Node(a,(Empty,Empty))
 lrot (Node(a,(e,Empty))) = Empty
 lrot (Node(a,(e, Node(d,(l,r))))) = Node(d,(Node(a,(e,l)), r))
 
@@ -1066,6 +1055,8 @@ splay = (flip (cataBTree g))
         aux_spl ((a,(e,d)), (h:t)) | h == True  = e t
                                    | otherwise = d t 
   
+
+
 \end{code}
 
 \subsection*{Problema 3}
