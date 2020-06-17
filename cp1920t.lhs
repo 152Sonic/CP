@@ -1035,9 +1035,9 @@ insOrd x = p1.(insOrd' x)
 isOrd' = cataBTree g
   where g = either (const (True,Empty))  isOrd_a
         isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
-        isOrd_a (a,((b1,Empty),(b2, Node (d,(l2,r2))))) = if(a<d && b1 && b2) then (True, Node(a,(Empty,Node (d,(l2,r2))))) else (False, Node(a,(Empty,Node(d,(l2,r2)))))
-        isOrd_a (a,((b1,Node (e,(l1,r1))) ,(b2,Empty))) = if(a>e && b1 && b2) then (True, Node(a,(Node(e,(l1,r1)),Empty))) else (False, Node(a,(Node(e,(l1,r1)),Empty)))
-        isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a > e && a < d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
+        isOrd_a (a,((b1,Empty),(b2, Node (d,(l2,r2))))) = if(a<=d && b1 && b2) then (True, Node(a,(Empty,Node (d,(l2,r2))))) else (False, Node(a,(Empty,Node(d,(l2,r2)))))
+        isOrd_a (a,((b1,Node (e,(l1,r1))) ,(b2,Empty))) = if(a>=e && b1 && b2) then (True, Node(a,(Node(e,(l1,r1)),Empty))) else (False, Node(a,(Node(e,(l1,r1)),Empty)))
+        isOrd_a (a,( (b1, Node (e,(l1,r1))),(b2,Node (d,(l2,r2))) )) | a >= e && a <= d && b1 && b2 = (True, Node (a,( Node(e,(l1,r1)), Node (d,(l2,r2)))) )
                                                                      | otherwise = (False, Node (a,(Node(e,(l1,r1)),Node (d,(l2,r2)))))
 
 
@@ -1056,7 +1056,7 @@ rrot (Node(a,(Node(e,(l,r)), d))) = Node(e,(l, Node(a,(r,d))))
 
 lrot (Empty) = Empty
 --lrot (Node(a,(Empty,Empty)))                  = Node(a,(Empty,Empty))
-lrot (Node(a,(e,Empty))) = Node(a,(e,Empty))
+lrot (Node(a,(e,Empty))) = Empty
 lrot (Node(a,(e, Node(d,(l,r))))) = Node(d,(Node(a,(e,l)), r))
 
 
