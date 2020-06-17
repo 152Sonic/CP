@@ -967,12 +967,18 @@ alterados os nomes ou tipos das funções dadas, mas pode ser adicionado texto e
 outras funções auxiliares que sejam necessárias.
 
 \subsection*{Problema 1}
+
+COMENTAR
 \begin{code}
 
 discollect :: (Ord b, Ord a) => [(b,[a])] -> [(b,a)]
 discollect = g .! id where
     g (a,x) = [(a,b) | b <- x]
 
+\end{code}
+
+COMENTAR
+\begin{code}
 dic_exp :: Dict -> [(String,[String])]
 dic_exp = collect . tar
 
@@ -982,14 +988,20 @@ tar = cataExp g where
 t_1 x = [("",x)]
 
 t_2 (o,l) = map(\(x,y) -> ((o++x),y)) (concat l)  
+\end{code}
+COMENTAR
 
+\begin{code}
 dic_rd  p = (procura p) . dic_exp
 
 procura p [] = Nothing
 procura p ((a,o):t) | p == a  = Just o
                     |otherwise = procura p t   
 
---dic_in = undefined
+\end{code}
+COMENTAR
+
+\begin{code}
 dic_in p m = dic_imp . (inserir_cenas p m) . dic_exp
 
 inserir_cenas a o [] = [(a,[o])]
@@ -1004,6 +1016,8 @@ inserir2 s1 (h2:t2) | s1 == h2 = (h2:t2)
 
 \subsection*{Problema 2}
 
+maisDir é uma função que retorna o elemento mais a direita de uma determinada árvore, para isso utilizamos um catamorfismo 
+
 \begin{code}
 maisDir = cataBTree g
   where g = either (const Nothing) dir_aux
@@ -1012,13 +1026,22 @@ maisDir = cataBTree g
 dir_aux (a,(e,Nothing)) = Just a
 dir_aux (a,(_,d)) = d 
 
+
+\end{code}
+COMENTAR
+\begin{code}
+
 maisEsq = cataBTree g
   where g = either (const Nothing) esq_aux
 
 esq_aux (a,(Nothing, d)) = Just a
 esq_aux (a,(e,_)) = e 
 
--------------------------
+
+\end{code}
+
+COMENTAR
+\begin{code}
 
 insOrd' x = cataBTree g 
   where g = either (const (Node(x,(Empty,Empty)), Empty))  insOrd_a 
@@ -1027,6 +1050,10 @@ insOrd' x = cataBTree g
 insOrd x = p1.(insOrd' x)
 
 
+\end{code}
+COMENTAR
+
+\begin{code}
 isOrd' = cataBTree g
   where g = either (const (True,Empty))  isOrd_a
         isOrd_a (a,((b1,Empty),(b2,Empty))) = if(b1 && b2) then (True, Node(a,(Empty,Empty)))  else (False, Node(a,(Empty,Empty)))
@@ -1037,18 +1064,31 @@ isOrd' = cataBTree g
 
 isOrd = p1 . isOrd' 
 
+\end{code}
+COMENTAR
 
+\begin{code}
 
 rrot Empty = Empty
 rrot (Node(a,(Empty,d))) = Node(a,(Empty,d))
 rrot (Node(a,(Node(e,(l,r)), d))) = Node(e,(l, Node(a,(r,d))))
 
+\end{code}
+
+COMENTAR
+
+\begin{code}
 
 lrot (Empty) = Empty
 lrot (Node(a,(e,Empty))) = Empty
 lrot (Node(a,(e, Node(d,(l,r))))) = Node(d,(Node(a,(e,l)), r))
 
 
+\end{code}
+
+Comentar
+
+\begin{code}
 splay = (flip (cataBTree g)) 
   where g = either (\x -> const Empty) (curry (aux_spl))
         aux_spl ((a,(e,d)), [])= Node(a,(e [], d []))
@@ -1061,36 +1101,66 @@ splay = (flip (cataBTree g))
 
 \subsection*{Problema 3}
 
+Para definir as funções deste exercicio baseamo-nos na BTree sendo que existem bastantes semelhanças entre a estrutura dada no problema e as BTree.
+
+Assim sendo:
+
+extLTree ->
+Transforma uma Bdt numa LTree esquecendo a informação presente nos nós de uma determinada Bdt (árvore de decisão)
+
 \begin{code}
 
 extLTree :: Bdt a -> LTree a
 extLTree = cataBdt g where
   g = either Leaf (Fork . p2)
+\end{code}
 
 
+\begin{code}
 inBdt = either Dec Query
+\end{code}
 
-
+\begin{code}
 outBdt (Dec a) = Left a
 outBdt (Query (a,(t1,t2)))  = Right(a,(t1,t2))
+\end{code}
 
-
+\begin{code}
 baseBdt f g = id -|- (f >< (g >< g))
+\end{code}
 
-
+\begin{code}
 recBdt f = baseBdt id f 
+\end{code}
 
-
-
+\begin{code}
 cataBdt a = a . (recBdt (cataBdt a)) . outBdt
+\end{code}
 
 
+Comentar a ANa
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |Bdt|
+&
+    |String + (String ><(Bdt ><Bdt))|
+            \ar[l]_-{|inBdt|}
+\\
+     |Bdt'|
+            \ar[u]^-{|ana f|}
+            \ar[r]_-{|f|}
+&
+     |String + String >< (Bdt' >< Bdt')|
+           \ar[u]_{|id + id >< ana (f >< f)|}
+}
+
+\begin{code}
 
 anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
+\end{code}
 
 
-
-
+\begin{code}
 navLTree :: LTree a -> ([Bool] -> LTree a)
 navLTree = cataLTree g 
   where g = either (flip (const Leaf)) (curry aux_Nav)
