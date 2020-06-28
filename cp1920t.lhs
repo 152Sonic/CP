@@ -113,7 +113,7 @@
 
 \begin{center}\large
 \begin{tabular}{ll}
-\textbf{Grupo} nr. & 99 (preencher)
+\textbf{Grupo} nr. & 10
 \\\hline
 a89605 & Carlos Miguel Luzia de Carvalho
 \\
@@ -971,7 +971,6 @@ outras funções auxiliares que sejam necessárias.
 \subsubsection{discollect}
 Para esta função partimos da definição da função collect definida em \textit{Exp.hs}. Esta função tem como propósito partir de uma lista de pares \textit{Strig,[String]} e originar uma lista de pares \textit{String,String}.
 
-DIAGRAMA  
 
 \begin{code}
 
@@ -981,12 +980,9 @@ discollect = g .! id where
 
 \end{code}
 
-\subsubsection{dic_exp}
+\subsubsection{dicexp}
 
-Para exportar um dicionário, a função dic_exp transforma utiliza duas funções auxiliares uma delas a collect definida em \textit{Exp.hs} e a função tar , sendo esta também um catamorfismo que tem como caso de paragem um par sem nenhuma letra e uma palavra, e que faz um map em que cada posição do vetor 
-
-
-Diagrama Tar 
+Para exportar um dicionário, a função dicexp transforma utiliza duas funções auxiliares uma delas a collect definida em \textit{Exp.hs} e a função tar , sendo esta também um catamorfismo que tem como caso de paragem um par sem nenhuma letra e uma palavra, e que faz um map em que cada posição do vetor 
 
 
 \begin{code}
@@ -1001,8 +997,8 @@ t_1 x = [("",x)]
 t_2 (o,l) = map(\(x,y) -> ((o++x),y)) (concat l)  
 \end{code}
 
-\subsubsection{dic_rd}
-Esta função está definida não utilizando catamorfismos diretamente mas sim através do uso de \textit{dic_exp}, exportando o dicionário para uma lista, e de seguida procurando com a função \textit{procura} a correspondente de uma palavra nessa lista. 
+\subsubsection{dicrd}
+Esta função está definida não utilizando catamorfismos diretamente mas sim através do uso de \textit{dicexp}, exportando o dicionário para uma lista, e de seguida procurando com a função \textit{procura} a correspondente de uma palavra nessa lista. 
 
 \begin{code}
 dic_rd  p = (procura p) . dic_exp
@@ -1013,8 +1009,8 @@ procura p ((a,o):t) | p == a  = Just o
 
 \end{code}
 
-\subsubsection{dic_in}
-Esta função está definida não utilizando catamorfismos diretamente mas sim através do uso de \textit{dic_exp} e \textit{dic_imp}, exportando o dicionário para uma lista, e de seguida inserindo uma nova palavra e ou tradução utilizando a função \textit{insere} , importando de seguida a nova lista num dicionário.
+\subsubsection{dicin}
+Esta função está definida não utilizando catamorfismos diretamente mas sim através do uso de \textit{dicexp} e \textit{dicimp}, exportando o dicionário para uma lista, e de seguida inserindo uma nova palavra e ou tradução utilizando a função \textit{insere} , importando de seguida a nova lista num dicionário.
 
 \begin{code}
 dic_in p m = dic_imp . (inserir_pal p m) . dic_exp
@@ -1034,7 +1030,7 @@ inserir2 s1 (h2:t2) | s1 == h2 = (h2:t2)
 
 \subsubsection{maisDir}
 
-maisDir é uma função que retorna o elemento mais a direita de uma determinada árvore, para isso utilizamos um catamorfismo que devolve o elemento mais a direita de uma árvore , que utiliza a função \textit{dir_aux} que define para uma árvore qual o nodo mais a direita .
+maisDir é uma função que retorna o elemento mais a direita de uma determinada árvore, para isso utilizamos um catamorfismo que devolve o elemento mais a direita de uma árvore , que utiliza a função \textit{diraux} que define para uma árvore qual o nodo mais a direita .
 
 \begin{code}
 maisDir = cataBTree g
@@ -1049,7 +1045,7 @@ dir_aux (a,(_,d)) = d
 
 \subsubsection{maisEsq}
 
-maisEsq é uma função que retorna o elemento mais a esquerda de uma determinada árvore, para isso utilizamos um catamorfismo que devolve o elemento mais a esquerda de uma árvore , que utiliza a função \textit{esq_aux} que define para uma árvore qual o nodo mais a esquerda.
+maisEsq é uma função que retorna o elemento mais a esquerda de uma determinada árvore, para isso utilizamos um catamorfismo que devolve o elemento mais a esquerda de uma árvore , que utiliza a função \textit{esqaux} que define para uma árvore qual o nodo mais a esquerda.
 
 
 \begin{code}
@@ -1066,7 +1062,20 @@ esq_aux (a,(e,_)) = e
 
 A função devolve uma \textit{BTree} com um determinado novo elemento inserido, para isso utilizamos a função \textit{insOrd'} que através de catamorfismo devolve duas \textit{BTree} sendo a primeira a alterada, e a segunda a inicial.
 
-
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |BTree|
+            \ar[d]^-{|insOrd'|}
+&
+    |1 + (A ><(BTree >< BTree))|
+            \ar[l]_-{|inBTree|}
+            \ar[d]_{|id + id >< insOrd' >< insOrd'|}
+\\
+     |BTree >< BTree|
+&
+     |1 + A >< (BTree >< BTree) ^2|
+            \ar[l]_-{|g|}
+}
 
 \begin{code}
 
@@ -1081,6 +1090,22 @@ insOrd x = p1.(insOrd' x)
 \subsubsection{isOrd}
 
 Esta função devolve um \textit{Bool} determinadno ou não se uma árvore se encontra ordenada, para isso utiliza como auxiliar a função \textit{isOrd'} que através de cum catamorfismo devlve um par (\textit{Bool, BTree}).
+
+
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |BTree|
+            \ar[d]^-{|isOrd|}
+&
+    |1 + (A ><(BTree >< BTree))|
+            \ar[l]_-{|inBTree|}
+            \ar[d]_{|id + id >< isOrd' >< isOrd'|}
+\\
+     |Bool >< BTree|
+&
+     |1 + A >< (Bool >< BTree) ^2|
+            \ar[l]_-{|g|}
+}
 
 
 \begin{code}
@@ -1122,7 +1147,24 @@ lrot (Node(a,(e, Node(d,(l,r))))) = Node(d,(Node(a,(e,l)), r))
 \subsubsection{splay}
 Inicialmente fizemos o diagrama para tentar perceber o que a função auxiliar teria de devolver/receber e maior compreensão dos tipos. Posto isto, usamos um \textit{curry} para juntar as variaveis num par, de seguida percorremos a lista e consoante o caso (o Bool) devolvemos o elemnto á esquerda ou direita da árvore e a cauda da lista.
 
-Diagrama
+
+
+
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |BTree|
+            \ar[d]^-{|splay|}
+&
+    |1 + (A ><(BTree >< BTree))|
+            \ar[l]_-{|inBTree|}
+            \ar[d]_{|id + id >< splay >< splay|}
+\\
+     |BTree^Bool*|
+&
+     |1 + A >< (BTree^Bool*)^2|
+            \ar[l]_-{|g|}
+}
+
 
 
 \begin{code}
@@ -1201,7 +1243,20 @@ anaBdt f = inBdt . ( recBdt (anaBdt f)) . f
 \subsubsection{navLTree}
 Inicialmente fizemos o diagrama para tentar perceber o que a função auxiliar teria de devolver/receber e maior compreensão dos tipos. Posto isto, usamos um \textit{curry} para juntar as variaveis num par, de seguida percorremos a lista de \textit{Bool}  e consoante o caso (o Bool) devolvemos o elemento á esquerda ou direita da árvore e a cauda da lista.
 
-DIAGRAMa
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |LTree|
+            \ar[d]^-{|navLTree|}
+&
+    |1 + (LTree >< LTree)|
+            \ar[l]_-{|inLTree|}
+            \ar[d]_{|id + navLTree >< navLTree|}
+\\
+     |LTree^Bool*|
+&
+     |1 + (LTree^Bool*)^2|
+            \ar[l]_-{|g|}
+}
 
 
 \begin{code}
@@ -1222,7 +1277,20 @@ navLTree = cataLTree g
 \subsubsection{bnavLTree}
 Esta função tem semelhanças com a função navLTree, porém em vez de percorrer uma lista de  \textit{Bool} percorre uma BTree de  \textit{Bool}, assim sendo devolvemos o elemento á esquerda ou direita da LTree e o elemento á esquerda ou direita da BTree, respetivamente, consoante o valor no nodo da BTree.
 
-DIAGRAMA
+\begin{eqnarray*}
+\xymatrix@@C=4cm{
+    |LTree|
+            \ar[d]^-{|bnavLTree|}
+&
+    |1 + (LTree >< LTree)|
+            \ar[l]_-{|inLTree|}
+            \ar[d]_{|id + bnavLTree >< bnavLTree|}
+\\
+     |LTree^BTree(Bool)|
+&
+     |1 + (LTree^BTree(Bool))^2|
+            \ar[l]_-{|g|}
+}
 
 \begin{code}
 bnavLTree = cataLTree g
